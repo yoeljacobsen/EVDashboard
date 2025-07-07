@@ -38,9 +38,13 @@ public class EVDashboardScreen extends Screen {
                                 .build())
                 .build();
 
-        return new PaneTemplate.Builder(pane)
+        return new PaneTemplate.Builder(
+                new Pane.Builder()
+                        .addRow(new Row.Builder().setTitle("State of Charge").addText(mSession.getSoc()).build())
+                        .addRow(new Row.Builder().setTitle("Range").addText(mSession.getRange()).build())
+                        .addRow(new Row.Builder().setTitle("Connected to Android Auto").addText(mSession.isConnectedToCar() ? "Yes" : "No").build())
+                        .build())
                 .setHeaderAction(Action.APP_ICON)
-                .setTitle("EV Dashboard")
                 .build();
     }
 }
