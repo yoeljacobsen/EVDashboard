@@ -1,0 +1,14 @@
+{
+  "general": {
+    "touch": true
+  },
+  "sensors": {
+    "location": true,
+    "fuel": true,
+    "accel": true,
+    "gyro": true,
+    "compass": true,
+    "speed": true,
+    "fuel_type": "electric"
+  }
+}
