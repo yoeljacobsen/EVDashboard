@@ -62,12 +62,13 @@ public class EVDashboardSession extends Session {
                         mSoc = String.format("%.1f%%", mockEnergyLevel.getBatteryPercent().getValue()); // Use battery percent from mock for SoC
                         mRange = String.format("%.1f km", mockEnergyLevel.getRangeRemainingMeters().getValue() / 1000.0f);
                         Log.d(TAG, "Mock SoC: " + mSoc + ", Mock Range: " + mRange);
-                    } else if (mCarInfo != null) {
-                        mEnergyLevelListener = new OnCarDataAvailableListener<EnergyLevel>() {
-                            @Override
-                            public void onCarDataAvailable(@NonNull EnergyLevel energyLevel) {
-                                Log.d(TAG, "onCarDataAvailable: EnergyLevel received. BatteryPercent: " + energyLevel.getBatteryPercent().getStatus() + ", RangeRemainingMeters: " + energyLevel.getRangeRemainingMeters().getStatus());
-                                if (energyLevel.getBatteryPercent().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
+                    } else { // This means mCarInfo is NOT ProjectedCarInfo
+                        if (mCarInfo != null) { // Check if it's a real CarInfo
+                            mEnergyLevelListener = new OnCarDataAvailableListener<EnergyLevel>() {
+                                @Override
+                                public void onCarDataAvailable(@NonNull EnergyLevel energyLevel) {
+                                    Log.d(TAG, "onCarDataAvailable: EnergyLevel received. BatteryPercent: " + energyLevel.getBatteryPercent().getStatus() + ", RangeRemainingMeters: " + energyLevel.getRangeRemainingMeters().getStatus());
+                                    if (energyLevel.getBatteryPercent().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
                                     mSoc = String.format("%.1f%%", energyLevel.getBatteryPercent().getValue());
                                     Log.d(TAG, "SoC (Battery): " + mSoc);
                                 } else {
@@ -109,7 +110,7 @@ public class EVDashboardSession extends Session {
             public void onDestroy(@NonNull LifecycleOwner owner) {
                 Log.d(TAG, "onDestroy lifecycle event.");
                 mIsConnectedToCar = false;
-                if (mCarInfo != null) {
+                if (mCarInfo != null && mEnergyLevelListener != null) {
                     mCarInfo.removeEnergyLevelListener(mEnergyLevelListener);
                     Log.d(TAG, "EnergyLevel listener removed.");
                 }
