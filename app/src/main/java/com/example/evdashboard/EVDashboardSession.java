@@ -1,4 +1,3 @@
-
 package com.example.evdashboard;
 
 import android.content.Intent;
@@ -69,30 +68,31 @@ public class EVDashboardSession extends Session {
                                 public void onCarDataAvailable(@NonNull EnergyLevel energyLevel) {
                                     Log.d(TAG, "onCarDataAvailable: EnergyLevel received. BatteryPercent: " + energyLevel.getBatteryPercent().getStatus() + ", RangeRemainingMeters: " + energyLevel.getRangeRemainingMeters().getStatus());
                                     if (energyLevel.getBatteryPercent().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
-                                    mSoc = String.format("%.1f%%", energyLevel.getBatteryPercent().getValue());
-                                    Log.d(TAG, "SoC (Battery): " + mSoc);
-                                } else {
-                                    mSoc = "--%";
-                                    Log.d(TAG, "SoC not available. Status: " + energyLevel.getBatteryPercent().getStatus());
-                                }
+                                        mSoc = String.format("%.1f%%", energyLevel.getBatteryPercent().getValue());
+                                        Log.d(TAG, "SoC (Battery): " + mSoc);
+                                    } else {
+                                        mSoc = "--%";
+                                        Log.d(TAG, "SoC not available. Status: " + energyLevel.getBatteryPercent().getStatus());
+                                    }
 
-                                if (energyLevel.getRangeRemainingMeters().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
-                                    mRange = String.format("%.1f km", energyLevel.getRangeRemainingMeters().getValue() / 1000.0f);
-                                    Log.d(TAG, "Range: " + mRange);
-                                } else {
-                                    mRange = "-- km";
-                                    Log.d(TAG, "Range not available. Status: " + energyLevel.getRangeRemainingMeters().getStatus());
-                                }
+                                    if (energyLevel.getRangeRemainingMeters().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
+                                        mRange = String.format("%.1f km", energyLevel.getRangeRemainingMeters().getValue() / 1000.0f);
+                                        Log.d(TAG, "Range: " + mRange);
+                                    } else {
+                                        mRange = "-- km";
+                                        Log.d(TAG, "Range not available. Status: " + energyLevel.getRangeRemainingMeters().getStatus());
+                                    }
 
-                                if (mEVDashboardScreen != null) {
-                                    mEVDashboardScreen.invalidate();
+                                    if (mEVDashboardScreen != null) {
+                                        mEVDashboardScreen.invalidate();
+                                    }
                                 }
-                            }
-                        };
-                        mCarInfo.addEnergyLevelListener(mExecutor, mEnergyLevelListener);
-                        Log.d(TAG, "EnergyLevel listener added.");
-                    } else {
-                        Log.w(TAG, "CarInfo is null. EnergyLevel listener not added.");
+                            };
+                            mCarInfo.addEnergyLevelListener(mExecutor, mEnergyLevelListener);
+                            Log.d(TAG, "EnergyLevel listener added.");
+                        } else {
+                            Log.w(TAG, "CarInfo is null. EnergyLevel listener not added.");
+                        }
                     }
                 } catch (IllegalStateException e) {
                     Log.e(TAG, "CarHardwareManager not available: " + e.getMessage() + ". Using mock data.");
@@ -152,6 +152,4 @@ public class EVDashboardSession extends Session {
     public String getAppVersion() {
         return mAppVersion;
     }
-
-    
 }

@@ -16,6 +16,17 @@ This section outlines the challenges faced during the development of this applic
 *   **`minCarApiLevel` Placement:** The `meta-data` tag for `androidx.car.app.minCarApiLevel` was found to be incorrectly placed in `AndroidManifest.xml` and was moved to be a direct child of the `application` tag.
 *   **App Categorization:** The app was initially categorized as `NAVIGATION`, which was incorrect for a dashboard application. This was changed to `IOT` in `AndroidManifest.xml`. An attempt was made to override `isNavigation()` in `EVDashboardCarAppService`, but this method does not exist in `CarAppService`.
 
+### Recent Fixes
+
+**1. `CAR_FUEL` Security Exception Resolution:**
+The persistent `java.lang.SecurityException: The car app does not have the required permission: com.google.android.gms.permission.CAR_FUEL` was resolved. The issue stemmed from `addEnergyLevelListener` being called on `ProjectedCarInfo` instances, which implicitly required the `CAR_FUEL` permission. The logic in `EVDashboardSession.java` was corrected to ensure that `addEnergyLevelListener` is only invoked when `mCarInfo` is *not* an instance of `ProjectedCarInfo`, thus preventing the security exception in the Android Auto environment.
+
+**2. `NullPointerException` on `onDestroy` Resolution:**
+A `java.lang.NullPointerException` occurring during the `onDestroy` lifecycle event was resolved. This happened because `removeEnergyLevelListener` was being called on a `null` `mEnergyLevelListener` when the app was running in Android Auto mode (where the listener was never initialized). A null check for `mEnergyLevelListener` was added in the `onDestroy` method to prevent this crash.
+
+**3. Compilation Errors Resolution:**
+Several structural compilation errors in `EVDashboardSession.java` were identified and resolved. These errors were primarily due to incorrect brace matching and `try-catch` block placement introduced during previous modifications. The file's structure was corrected to ensure proper syntax and compilation.
+
 ### Persistent `CAR_FUEL` Security Exception
 
 **Problem:** Despite removing the `CAR_FUEL` permission from `AndroidManifest.xml` and attempting to prioritize `getBatteryPercent()` over `getFuelPercent()`, a `java.lang.SecurityException: The car app does not have the required permission: com.google.android.gms.permission.CAR_FUEL` continued to occur. This crash happened specifically when `mCarInfo.addEnergyLevelListener` was called.
@@ -30,7 +41,7 @@ This section outlines the challenges faced during the development of this applic
 The persistent `CAR_FUEL` security exception, even after extensive attempts to remove the permission and control data requests, indicates a fundamental behavior of the Android Auto host when dealing with `ProjectedCarInfo`. It appears that when `addEnergyLevelListener` is called on a `ProjectedCarInfo` object (which is what Android Auto provides), the host implicitly attempts to provide *all* available `EnergyLevel` data, including fuel-related data, and requires the `CAR_FUEL` permission to do so.
 
 **Current Solution:**
-To circumvent this issue and ensure the app functions for EV-only purposes without requiring the `CAR_FUEL` permission, the application now explicitly uses **mock data for `EnergyLevel` when running on Android Auto (i.e., when `mCarInfo` is an instance of `ProjectedCarInfo`)**. This prevents the problematic `addEnergyLevelListener` call from ever being made in this specific environment.
+To circumvent the `CAR_FUEL` permission issue, the application now explicitly uses **mock data for `EnergyLevel` when running on Android Auto (i.e., when `mCarInfo` is an instance of `ProjectedCarInfo`)**.
 
 **Remaining Issues:**
 *   **Car API Level Display:** The Car API level is still displayed as 0. This needs further investigation to understand why `getCarAppApiLevel()` is returning 0 in the Android Auto environment.
