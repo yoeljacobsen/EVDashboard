@@ -9,7 +9,9 @@
     <uses-permission android:name="android.car.permission.CAR_SENSORS" />
     
 
-    <uses-feature android:name="android.hardware.type.automotive" android:required="true" />
+    <uses-feature
+        android:name="android.hardware.type.pc"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -41,10 +43,6 @@
                 <category android:name="androidx.car.app.category.IOT" />
             </intent-filter>
         </service>
-
-        <meta-data
-            android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />
 
     </application>
 
