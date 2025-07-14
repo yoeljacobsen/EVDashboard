@@ -75,4 +75,3 @@ build-cache/
 
 # To ignore all files in the build folder
 build/
-/app/src/main/res/xml/automotive_app_desc.xml

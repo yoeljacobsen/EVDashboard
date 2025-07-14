@@ -12,7 +12,6 @@ import androidx.car.app.hardware.common.OnCarDataAvailableListener;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
-
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -27,83 +26,73 @@ public class EVDashboardSession extends Session {
     private String mRange = "-- km";
     private EVDashboardScreen mEVDashboardScreen;
     private boolean mIsConnectedToCar = false;
-    private boolean mIsMockData = false;
-    private int mCarAppApiLevel = 0;
-    private int mPhoneApiLevel = android.os.Build.VERSION.SDK_INT;
-    private String mAppVersion = "";
 
     public EVDashboardSession() {
         Log.d(TAG, "EVDashboardSession constructor called.");
         getLifecycle().addObserver(new DefaultLifecycleObserver() {
             @Override
             public void onCreate(@NonNull LifecycleOwner owner) {
-                try {
-                    mAppVersion = getCarContext().getPackageManager().getPackageInfo(getCarContext().getPackageName(), 0).versionName;
-                } catch (android.content.pm.PackageManager.NameNotFoundException e) {
-                    mAppVersion = "N/A";
-                }
-                Log.d(TAG, "DefaultLifecycleObserver onCreate called.");
                 Log.d(TAG, "onCreate lifecycle event.");
                 mIsConnectedToCar = true;
-                try {
-                    CarHardwareManager carHardwareManager = getCarContext().getCarService(CarHardwareManager.class);
-                    mCarInfo = carHardwareManager.getCarInfo();
-                    Log.d(TAG, "CarInfo retrieved: " + (mCarInfo != null ? mCarInfo.toString() : "null"));
-                    mIsMockData = false;
-                    mCarAppApiLevel = getCarContext().getCarAppApiLevel();
-                    Log.d(TAG, "Car App API Level: " + mCarAppApiLevel);
+                CarHardwareManager carHardwareManager = getCarContext().getCarService(CarHardwareManager.class);
+                mCarInfo = carHardwareManager.getCarInfo();
 
-                    if (mCarInfo instanceof androidx.car.app.hardware.info.ProjectedCarInfo) {
-                        Log.w(TAG, "Running on Android Auto (ProjectedCarInfo). Using mock data for EnergyLevel.");
-                        mIsMockData = true;
-                        MockCarInfoProvider mockProvider = new MockCarInfoProvider();
-                        EnergyLevel mockEnergyLevel = mockProvider.getMockEnergyLevel();
-                        mSoc = String.format("%.1f%%", mockEnergyLevel.getBatteryPercent().getValue()); // Use battery percent from mock for SoC
-                        mRange = String.format("%.1f km", mockEnergyLevel.getRangeRemainingMeters().getValue() / 1000.0f);
-                        Log.d(TAG, "Mock SoC: " + mSoc + ", Mock Range: " + mRange);
-                    } else { // This means mCarInfo is NOT ProjectedCarInfo
-                        if (mCarInfo != null) { // Check if it's a real CarInfo
-                            mEnergyLevelListener = new OnCarDataAvailableListener<EnergyLevel>() {
-                                @Override
-                                public void onCarDataAvailable(@NonNull EnergyLevel energyLevel) {
-                                    Log.d(TAG, "onCarDataAvailable: EnergyLevel received. BatteryPercent: " + energyLevel.getBatteryPercent().getStatus() + ", RangeRemainingMeters: " + energyLevel.getRangeRemainingMeters().getStatus());
-                                    if (energyLevel.getBatteryPercent().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
-                                        mSoc = String.format("%.1f%%", energyLevel.getBatteryPercent().getValue());
-                                        Log.d(TAG, "SoC (Battery): " + mSoc);
-                                    } else {
-                                        mSoc = "--%";
-                                        Log.d(TAG, "SoC not available. Status: " + energyLevel.getBatteryPercent().getStatus());
-                                    }
-
-                                    if (energyLevel.getRangeRemainingMeters().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
-                                        mRange = String.format("%.1f km", energyLevel.getRangeRemainingMeters().getValue() / 1000.0f);
-                                        Log.d(TAG, "Range: " + mRange);
-                                    } else {
-                                        mRange = "-- km";
-                                        Log.d(TAG, "Range not available. Status: " + energyLevel.getRangeRemainingMeters().getStatus());
-                                    }
-
-                                    if (mEVDashboardScreen != null) {
-                                        mEVDashboardScreen.invalidate();
-                                    }
-                                }
-                            };
-                            mCarInfo.addEnergyLevelListener(mExecutor, mEnergyLevelListener);
-                            Log.d(TAG, "EnergyLevel listener added.");
+<<<<<<< HEAD
+                    mEnergyLevelListener = new OnCarDataAvailableListener<EnergyLevel>() {
+                    @Override
+                    public void onCarDataAvailable(@NonNull EnergyLevel energyLevel) {
+                        Log.d(TAG, "onCarDataAvailable: EnergyLevel received.");
+                        if (energyLevel.getFuelPercent().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
+                            mSoc = String.format("%.1f%%", energyLevel.getFuelPercent().getValue());
+                            Log.d(TAG, "SoC: " + mSoc);
                         } else {
-                            Log.w(TAG, "CarInfo is null. EnergyLevel listener not added.");
+                            mSoc = "--%";
+                            Log.d(TAG, "SoC not available. Status: " + energyLevel.getFuelPercent().getStatus());
+                        }
+
+                        if (energyLevel.getRangeRemainingMeters().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
+                            mRange = String.format("%.1f km", energyLevel.getRangeRemainingMeters().getValue() / 1000.0f);
+                            Log.d(TAG, "Range: " + mRange);
+                        } else {
+                            mRange = "-- km";
+                            Log.d(TAG, "Range not available. Status: " + energyLevel.getRangeRemainingMeters().getStatus());
+                        }
+
+                        if (mEVDashboardScreen != null) {
+                            mEVDashboardScreen.invalidate();
                         }
                     }
-                } catch (IllegalStateException e) {
-                    Log.e(TAG, "CarHardwareManager not available: " + e.getMessage() + ". Using mock data.");
-                    mIsMockData = true;
-                    // Use mock data when CarHardwareManager is not available
-                    MockCarInfoProvider mockProvider = new MockCarInfoProvider();
-                    EnergyLevel mockEnergyLevel = mockProvider.getMockEnergyLevel();
-                    mSoc = String.format("%.1f%%", mockEnergyLevel.getBatteryPercent().getValue());
-                    mRange = String.format("%.1f km", mockEnergyLevel.getRangeRemainingMeters().getValue() / 1000.0f);
-                    Log.d(TAG, "Mock SoC: " + mSoc + ", Mock Range: " + mRange);
-                }
+                };
+                mCarInfo.addEnergyLevelListener(mExecutor, mEnergyLevelListener);
+                Log.d(TAG, "EnergyLevel listener added.");
+                mEnergyLevelListener = new OnCarDataAvailableListener<EnergyLevel>() {
+                    @Override
+                    public void onCarDataAvailable(@NonNull EnergyLevel energyLevel) {
+                        Log.d(TAG, "onCarDataAvailable: EnergyLevel received.");
+                        if (energyLevel.getFuelPercent().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
+                            mSoc = String.format("%.1f%%", energyLevel.getFuelPercent().getValue());
+                            Log.d(TAG, "SoC: " + mSoc);
+                        } else {
+                            mSoc = "--%";
+                            Log.d(TAG, "SoC not available. Status: " + energyLevel.getFuelPercent().getStatus());
+                        }
+
+                        if (energyLevel.getRangeRemainingMeters().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
+                            mRange = String.format("%.1f km", energyLevel.getRangeRemainingMeters().getValue() / 1000.0f);
+                            Log.d(TAG, "Range: " + mRange);
+                        } else {
+                            mRange = "-- km";
+                            Log.d(TAG, "Range not available. Status: " + energyLevel.getRangeRemainingMeters().getStatus());
+                        }
+
+                        if (mEVDashboardScreen != null) {
+                            mEVDashboardScreen.invalidate();
+>>>>>>> parent of 915bcb9 (Fix: Address CAR_FUEL permission and EnergyLevel data handling\n\n- Removed CAR_FUEL permission from AndroidManifest.xml.\n- Modified EVDashboardSession to prioritize battery percentage for SoC.\n- Implemented conditional mock data usage for ProjectedCarInfo on Android Auto to prevent CAR_FUEL permission issues.\n- Updated MockCarInfoProvider to include battery percentage.\n- Incremented app versionCode to 3 and versionName to 1.2.)
+                        }
+                    }
+                };
+                mCarInfo.addEnergyLevelListener(mExecutor, mEnergyLevelListener);
+                Log.d(TAG, "EnergyLevel listener added.");
             }
 
             @Override
@@ -135,21 +124,5 @@ public class EVDashboardSession extends Session {
 
     public boolean isConnectedToCar() {
         return mIsConnectedToCar;
-    }
-
-    public boolean isMockData() {
-        return mIsMockData;
-    }
-
-    public int getCarAppApiLevel() {
-        return mCarAppApiLevel;
-    }
-
-    public int getPhoneApiLevel() {
-        return mPhoneApiLevel;
-    }
-
-    public String getAppVersion() {
-        return mAppVersion;
     }
 }

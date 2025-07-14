@@ -27,18 +27,10 @@ public class EVDashboardScreen extends Screen {
 
         Row socRow = new Row.Builder().setTitle("SoC").addText(soc).build();
         Row rangeRow = new Row.Builder().setTitle("Range").addText(range).build();
-        Row mockDataRow = new Row.Builder().setTitle("Mock Data").addText(mSession.isMockData() ? "Yes" : "No").build();
-        Row carApiLevelRow = new Row.Builder().setTitle("Car API Level").addText(String.valueOf(mSession.getCarAppApiLevel())).build();
-        Row phoneApiLevelRow = new Row.Builder().setTitle("Phone API Level").addText(String.valueOf(mSession.getPhoneApiLevel())).build();
-        Row appVersionRow = new Row.Builder().setTitle("App Version").addText(mSession.getAppVersion()).build();
 
         Pane pane = new Pane.Builder()
                 .addRow(socRow)
                 .addRow(rangeRow)
-                .addRow(mockDataRow)
-                .addRow(carApiLevelRow)
-                .addRow(phoneApiLevelRow)
-                .addRow(appVersionRow)
                 .addAction(
                         new Action.Builder()
                                 .setTitle("Refresh")
@@ -46,7 +38,12 @@ public class EVDashboardScreen extends Screen {
                                 .build())
                 .build();
 
-        return new PaneTemplate.Builder(pane)
+        return new PaneTemplate.Builder(
+                new Pane.Builder()
+                        .addRow(new Row.Builder().setTitle("State of Charge").addText(mSession.getSoc()).build())
+                        .addRow(new Row.Builder().setTitle("Range").addText(mSession.getRange()).build())
+                        .addRow(new Row.Builder().setTitle("Connected to Android Auto").addText(mSession.isConnectedToCar() ? "Yes" : "No").build())
+                        .build())
                 .setHeaderAction(Action.APP_ICON)
                 .build();
     }
