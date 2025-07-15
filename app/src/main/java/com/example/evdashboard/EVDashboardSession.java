@@ -37,34 +37,6 @@ public class EVDashboardSession extends Session {
                 CarHardwareManager carHardwareManager = getCarContext().getCarService(CarHardwareManager.class);
                 mCarInfo = carHardwareManager.getCarInfo();
 
-<<<<<<< HEAD
-                    mEnergyLevelListener = new OnCarDataAvailableListener<EnergyLevel>() {
-                    @Override
-                    public void onCarDataAvailable(@NonNull EnergyLevel energyLevel) {
-                        Log.d(TAG, "onCarDataAvailable: EnergyLevel received.");
-                        if (energyLevel.getFuelPercent().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
-                            mSoc = String.format("%.1f%%", energyLevel.getFuelPercent().getValue());
-                            Log.d(TAG, "SoC: " + mSoc);
-                        } else {
-                            mSoc = "--%";
-                            Log.d(TAG, "SoC not available. Status: " + energyLevel.getFuelPercent().getStatus());
-                        }
-
-                        if (energyLevel.getRangeRemainingMeters().getStatus() == androidx.car.app.hardware.common.CarValue.STATUS_SUCCESS) {
-                            mRange = String.format("%.1f km", energyLevel.getRangeRemainingMeters().getValue() / 1000.0f);
-                            Log.d(TAG, "Range: " + mRange);
-                        } else {
-                            mRange = "-- km";
-                            Log.d(TAG, "Range not available. Status: " + energyLevel.getRangeRemainingMeters().getStatus());
-                        }
-
-                        if (mEVDashboardScreen != null) {
-                            mEVDashboardScreen.invalidate();
-                        }
-                    }
-                };
-                mCarInfo.addEnergyLevelListener(mExecutor, mEnergyLevelListener);
-                Log.d(TAG, "EnergyLevel listener added.");
                 mEnergyLevelListener = new OnCarDataAvailableListener<EnergyLevel>() {
                     @Override
                     public void onCarDataAvailable(@NonNull EnergyLevel energyLevel) {
@@ -87,7 +59,6 @@ public class EVDashboardSession extends Session {
 
                         if (mEVDashboardScreen != null) {
                             mEVDashboardScreen.invalidate();
->>>>>>> parent of 915bcb9 (Fix: Address CAR_FUEL permission and EnergyLevel data handling\n\n- Removed CAR_FUEL permission from AndroidManifest.xml.\n- Modified EVDashboardSession to prioritize battery percentage for SoC.\n- Implemented conditional mock data usage for ProjectedCarInfo on Android Auto to prevent CAR_FUEL permission issues.\n- Updated MockCarInfoProvider to include battery percentage.\n- Incremented app versionCode to 3 and versionName to 1.2.)
                         }
                     }
                 };
