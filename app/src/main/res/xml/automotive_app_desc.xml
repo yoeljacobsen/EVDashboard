@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<automotiveApp>
+<automotiveApp xmlns:android="http://schemas.android.com/apk/res/android">
     <uses name="template" />
+    <minApi value="1"/>
+    <uses-feature
+        android:name="android.hardware.type.automotive"
+        android:required="true" />
+    <uses-library
+        android:name="androidx.car.app"
+        android:required="true" />
 </automotiveApp>
