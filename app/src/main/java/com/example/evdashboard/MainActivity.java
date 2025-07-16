@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         
-	checkAndRequestFuelPermission();
+	    checkAndRequestFuelPermission();
     }
 
 
@@ -54,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
     // This integer is used to identify the result in the onRequestPermissionsResult callback.
     private static final int REQUEST_CAR_FUEL_PERMISSION = 101;
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Check the permission status every time the activity is resumed.
+        // This ensures the UI is updated if the user grants the permission and returns to the app.
+        checkAndRequestFuelPermission();
+    }
 
     private void checkAndRequestFuelPermission() {
         // The specific permission string for car fuel data.
